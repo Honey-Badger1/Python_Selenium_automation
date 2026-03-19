@@ -1,0 +1,200 @@
+┌────────────┐
+│ Jenkins /  │
+│ Task Runner │
+└─────┬──────┘
+      │
+      │ Executes task
+      │
+      ▼
+┌─────────────────────────────┐
+│ CSRegistration.py           │
+│ (Task Runner)               │
+│                             │
+│ - Reads context.json        │
+│ - Reads CSRegistration.input│
+│ - Builds Input JSON         │
+│ - Sends POST request        │
+└─────────┬───────────────────┘
+          │ HTTP POST
+          │ /api/hdca/server/csregistration
+          ▼
+┌─────────────────────────────┐
+│ Django URL Router           │
+│ serverurls.py               │
+└─────────┬───────────────────┘
+          │
+          ▼
+┌─────────────────────────────┐
+│ CSRegistrationServerView    │
+│ (serverview.py)             │
+│                             │
+│ - Receives request.data     │
+│ - Creates Lib object        │
+│ - Calls business logic      │
+└─────────┬───────────────────┘
+          │ Python call
+          ▼
+┌──────────────────────────────────────────┐
+│ ValidateCSRegistration                   │
+│ (CSRegistration_lib.py)                  │
+│                                          │
+│ __init__():                              │
+│  - Parses context                        │
+│  - Extracts server creds                │
+│  - Calls BaseProbe.__init__()            │
+│  - Initializes logger                   │
+│                                          │
+│ registration_of_server():                │
+│  ┌────────────────────────────────────┐ │
+│  │ SSH connect (paramiko)              │ │
+│  └────────────────────────────────────┘ │
+│        │                                 │
+│        │ ensure /etc/hosts entry         │
+│        │ (idempotent)                    │
+│        ▼                                 │
+│  ┌────────────────────────────────────┐ │
+│  │ Check commonservice directory       │ │
+│  └────────────────────────────────────┘ │
+│        │                                 │
+│        │ if already registered           │
+│        ├──────────────► RETURN True     │
+│        │                                 │
+│        ▼                                 │
+│  ┌────────────────────────────────────┐ │
+│  │ Run setupcommonservice              │ │
+│  │ (interactive command)               │ │
+│  └────────────────────────────────────┘ │
+│        │                                 │
+│        │ send password + yes             │
+│        ▼                                 │
+│  ┌────────────────────────────────────┐ │
+│  │ Validate output ("registered")      │ │
+│  └────────────────────────────────────┘ │
+│                                          │
+│  - Return True / False                   │
+└─────────┬────────────────────────────────┘
+          │
+          ▼
+┌─────────────────────────────┐
+│ CSRegistrationServerView    │
+│                             │
+│ - Sends HTTP response       │
+└─────────┬───────────────────┘
+          │
+          ▼
+┌─────────────────────────────┐
+│ CSRegistration.py           │
+│                             │
+│ - Reads response            │
+│ - Sends PASS / FAIL         │
+│   to TAF log API            │
+└─────────┬───────────────────┘
+          │
+          ▼
+┌─────────────────────────────┐
+│ Task UI / Jenkins            │
+│                             │
+│ - Displays logs             │
+│ - Shows task result         │
+└─────────────────────────────┘
+
+
+
+Key Understanding (Very Important)
+🔹 Who calls whom?
+Caller	Calls
+Jenkins	CSRegistration.py
+CSRegistration.py	Django API
+Django View	Lib class
+Lib class	SSH + OS commands
+🔹 Where is main()?
+
+❌ There is NO main()
+✔ Django view is the entry point
+
+
+
+
+
+
+Final Mental Model (Remember This)
+
+TAF v2 = MVC + API + Automation
+
+Model  → context.json + input
+View   → Django REST View
+Logic  → Lib file (SSH / Selenium)
+
+
+
+
+
+
+
+
+
+
+┌────────────┐
+│ Jenkins /  │
+│ TAF Runner │
+└─────┬──────┘
+      │
+      ▼
+┌───────────────────────────────┐
+│ CSRegistration.py             │
+│ (Task Runner)                 │
+│                               │
+│ - Reads context + input       │
+│ - Builds JSON                 │
+│ - Calls Django API            │
+└─────────┬─────────────────────┘
+          │ HTTP POST
+          ▼
+┌───────────────────────────────┐
+│ Django URLs (serverurls.py)   │
+└─────────┬─────────────────────┘
+          │
+          ▼
+┌───────────────────────────────┐
+│ Django View (serverview.py)   │
+│                               │
+│ - Parses request              │
+│ - Instantiates Lib            │
+│ - Calls registration()        │
+└─────────┬─────────────────────┘
+          │
+          ▼
+┌────────────────────────────────────────────┐
+│ ValidateCSRegistration (LIB)                │
+│                                            │
+│ ┌──────────── SERVER FLOW ──────────────┐ │
+│ │ SSH → Server                           │ │
+│ │ - /etc/hosts entry                    │ │
+│ │ - check commonservice dir             │ │
+│ │ - setupcommonservice (server)         │ │
+│ └───────────────────────────────────────┘ │
+│                                            │
+│ ┌──────────── PROBE FLOW ───────────────┐ │
+│ │ SSH → Probe                            │ │
+│ │ - /etc/hosts entry                    │ │
+│ │ - check commonservice dir             │ │
+│ │ - setupcommonservice (probe)          │ │
+│ └───────────────────────────────────────┘ │
+│                                            │
+│ - Validate success                         │
+│ - Return status                            │
+└─────────┬──────────────────────────────────┘
+          │
+          ▼
+┌───────────────────────────────┐
+│ Django View                   │
+│ - Returns HTTP response       │
+└─────────┬─────────────────────┘
+          │
+          ▼
+┌───────────────────────────────┐
+│ CSRegistration.py             │
+│ - Logs PASS / FAIL            │
+└───────────────────────────────┘
+
+

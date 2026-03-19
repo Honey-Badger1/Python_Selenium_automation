@@ -53,7 +53,7 @@
 │        │ (idempotent)                    │
 │        ▼                                 │
 │  ┌────────────────────────────────────┐  │
-│  │ Check commonservice directory      │  │
+│  │ Check comemonservice directory     │  │
 │  └────────────────────────────────────┘  │
 │        │                                 │
 │        │ if already registered           │
@@ -61,7 +61,7 @@
 │        │                                 │
 │        ▼                                 │
 │  ┌────────────────────────────────────┐  │
-│  │ Run setupcommonservice             │  │
+│  │ Run setupcomemonservice            │  │
 │  │ (interactive command)              │  │
 │  └────────────────────────────────────┘  │
 │        │                                 │

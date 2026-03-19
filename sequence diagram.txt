@@ -170,15 +170,15 @@ Logic  → Lib file (SSH / Selenium)
 │ ┌──────────── SERVER FLOW ──────────────┐  │
 │ │ SSH → Server                          │  │
 │ │ - /etc/hosts entry                    │  │
-│ │ - check commonservice dir             │  │
-│ │ - setupcommonservice (server)         │  │
+│ │ - check comemonservice dir            │  │
+│ │ - setupcomemonservice (server)        │  │
 │ └───────────────────────────────────────┘  │
 │                                            │
 │ ┌──────────── PROBE FLOW ───────────────┐  │
 │ │ SSH → Probe                           │  │
 │ │ - /etc/hosts entry                    │  │
-│ │ - check commonservice dir             │  │
-│ │ - setupcommonservice (probe)          │  │
+│ │ - check comemonservice dir            │  │
+│ │ - setupcomemonservice (probe)         │  │
 │ └───────────────────────────────────────┘  │
 │                                            │
 │ - Validate success                         │

@@ -1,5 +1,5 @@
 ┌────────────┐
-│ Jenkins /  │
+│ Jenkins /   │
 │ Task Runner │
 └─────┬──────┘
       │
@@ -40,36 +40,36 @@
 │                                          │
 │ __init__():                              │
 │  - Parses context                        │
-│  - Extracts server creds                │
+│  - Extracts server creds                 │
 │  - Calls BaseProbe.__init__()            │
-│  - Initializes logger                   │
+│  - Initializes logger                    │
 │                                          │
 │ registration_of_server():                │
-│  ┌────────────────────────────────────┐ │
-│  │ SSH connect (paramiko)              │ │
-│  └────────────────────────────────────┘ │
+│  ┌────────────────────────────────────┐  │
+│  │ SSH connect (paramiko)             │  │
+│  └────────────────────────────────────┘  │
 │        │                                 │
 │        │ ensure /etc/hosts entry         │
 │        │ (idempotent)                    │
 │        ▼                                 │
-│  ┌────────────────────────────────────┐ │
-│  │ Check commonservice directory       │ │
-│  └────────────────────────────────────┘ │
+│  ┌────────────────────────────────────┐  │
+│  │ Check commonservice directory      │  │
+│  └────────────────────────────────────┘  │
 │        │                                 │
 │        │ if already registered           │
-│        ├──────────────► RETURN True     │
+│        ├──────────────► RETURN True      │
 │        │                                 │
 │        ▼                                 │
-│  ┌────────────────────────────────────┐ │
-│  │ Run setupcommonservice              │ │
-│  │ (interactive command)               │ │
-│  └────────────────────────────────────┘ │
+│  ┌────────────────────────────────────┐  │
+│  │ Run setupcommonservice             │  │
+│  │ (interactive command)              │  │
+│  └────────────────────────────────────┘  │
 │        │                                 │
 │        │ send password + yes             │
 │        ▼                                 │
-│  ┌────────────────────────────────────┐ │
-│  │ Validate output ("registered")      │ │
-│  └────────────────────────────────────┘ │
+│  ┌────────────────────────────────────┐  │
+│  │ Validate output ("registered")     │  │
+│  └────────────────────────────────────┘  │
 │                                          │
 │  - Return True / False                   │
 └─────────┬────────────────────────────────┘
@@ -87,12 +87,12 @@
 │                             │
 │ - Reads response            │
 │ - Sends PASS / FAIL         │
-│   to TAF log API            │
+│   to Task log API           │
 └─────────┬───────────────────┘
           │
           ▼
 ┌─────────────────────────────┐
-│ Task UI / Jenkins            │
+│ Task UI / Jenkins           │
 │                             │
 │ - Displays logs             │
 │ - Shows task result         │
@@ -136,7 +136,7 @@ Logic  → Lib file (SSH / Selenium)
 
 ┌────────────┐
 │ Jenkins /  │
-│ TAF Runner │
+│ TaskRunner │
 └─────┬──────┘
       │
       ▼
@@ -165,21 +165,21 @@ Logic  → Lib file (SSH / Selenium)
           │
           ▼
 ┌────────────────────────────────────────────┐
-│ ValidateCSRegistration (LIB)                │
+│ ValidateCSRegistration (LIB)               │
 │                                            │
-│ ┌──────────── SERVER FLOW ──────────────┐ │
-│ │ SSH → Server                           │ │
-│ │ - /etc/hosts entry                    │ │
-│ │ - check commonservice dir             │ │
-│ │ - setupcommonservice (server)         │ │
-│ └───────────────────────────────────────┘ │
+│ ┌──────────── SERVER FLOW ──────────────┐  │
+│ │ SSH → Server                          │  │
+│ │ - /etc/hosts entry                    │  │
+│ │ - check commonservice dir             │  │
+│ │ - setupcommonservice (server)         │  │
+│ └───────────────────────────────────────┘  │
 │                                            │
-│ ┌──────────── PROBE FLOW ───────────────┐ │
-│ │ SSH → Probe                            │ │
-│ │ - /etc/hosts entry                    │ │
-│ │ - check commonservice dir             │ │
-│ │ - setupcommonservice (probe)          │ │
-│ └───────────────────────────────────────┘ │
+│ ┌──────────── PROBE FLOW ───────────────┐  │
+│ │ SSH → Probe                           │  │
+│ │ - /etc/hosts entry                    │  │
+│ │ - check commonservice dir             │  │
+│ │ - setupcommonservice (probe)          │  │
+│ └───────────────────────────────────────┘  │
 │                                            │
 │ - Validate success                         │
 │ - Return status                            │
